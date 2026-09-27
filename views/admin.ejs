@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="hy">
+<head>
+<meta charset="utf-8">
+<title>Ադմին</title>
+<style>
+  :root{
+    --ink:#1c1c1c;
+    --muted:#8a8a8a;
+    --line:#e6e4df;
+    --paper:#fbfaf8;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    padding:56px 20px 40px;
+  }
+  .wrap{max-width:520px;margin:0 auto}
+
+  #q{
+    font-size:1.5rem;
+    font-weight:600;
+    line-height:1.35;
+    text-align:center;
+    margin:0 0 32px;
+    letter-spacing:-.01em;
+  }
+
+  #bars{display:flex;flex-direction:column;gap:14px;margin-bottom:36px}
+
+  .option{
+    border:1px solid var(--line);
+    background:var(--card);
+    border-radius:12px;
+    padding:16px 18px;
+    transition:background .2s ease, border-color .2s ease;
+    box-shadow:0 1px 2px rgba(0,0,0,.06);
+  }
+
+  .option-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  .option-name{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:1.15rem;
+    font-weight:600;
+    color:#fff;
+  }
+  .dot{
+    width:11px;height:11px;
+    border-radius:50%;
+    flex:none;
+  }
+  .option-meta{
+    display:flex;
+    align-items:baseline;
+    gap:9px;
+    white-space:nowrap;
+  }
+  .option-votes{
+    font-size:.75rem;
+    color:rgba(255,255,255,.8);
+  }
+  .option-pct{
+    font-size:1.3rem;
+    font-weight:800;
+    min-width:3.2ch;
+    text-align:right;
+    color:#fff;
+  }
+  .track{
+    position:relative;
+    height:10px;
+    background:rgba(255,255,255,.3);
+    border-radius:99px;
+    overflow:hidden;
+  }
+  .fill{
+    position:absolute;
+    top:0;left:0;
+    height:100%;
+    border-radius:99px;
+    background:#fff;
+    transition:width .35s ease;
+  }
+
+  .nav{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    margin-bottom:28px;
+  }
+  .nav button{
+    font-family:inherit;
+    font-size:.9rem;
+    font-weight:600;
+    padding:9px 16px;
+    background:#eef1fb;
+    color:#3b4d8b;
+    border:1px solid #dde3f5;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .nav button:hover{background:#e3e8f9}
+  #pos{
+    font-size:.85rem;
+    color:var(--muted);
+    min-width:52px;
+    text-align:center;
+  }
+
+  .video-actions{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    border-top:1px solid var(--line);
+    padding-top:24px;
+  }
+  .video-actions button{
+    font-family:inherit;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:.9rem;
+    font-weight:600;
+    padding:10px 16px;
+    border:1px solid transparent;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .video-actions .play{font-size:.7rem}
+  #watchQBtn{background:#e9eef5;color:#34495e;border-color:#d7dfec}
+  #watchQBtn:hover{background:#dde6f0}
+  #watchABtn{background:#e2f4ee;color:#16795f;border-color:#cdeadf}
+  #watchABtn:hover{background:#d5efe6}
+
+  .modal-overlay{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(20,18,16,.82);
+    align-items:center; justify-content:center;
+    z-index:1000;
+    padding:24px;
+  }
+  .modal-box{
+    position:relative;
+    background:#000;
+    border-radius:10px;
+    max-width:90vw;
+    max-height:90vh;
+    line-height:0;
+  }
+  .modal-box video{
+    display:block;
+    max-width:90vw;
+    max-height:85vh;
+    border-radius:10px;
+  }
+  .close-btn{
+    position:absolute;
+    top:-14px; right:-14px;
+    width:32px; height:32px;
+    border-radius:50%;
+    background:#fff;
+    color:#1c1c1c;
+    border:none;
+    font-size:18px;
+    line-height:32px;
+    padding:0;
+    margin:0;
+    cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.35);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2 id="q"></h2>
+  <div id="bars"></div>
+
+  <div class="nav">
+    <button id="prev">&larr; Նախորդ</button>
+    <span id="pos"></span>
+    <button id="next">Հաջորդ &rarr;</button>
+  </div>
+
+  <div class="video-actions">
+    <button id="watchQBtn"><span class="play">&#9654;</span>Հարցի տեսանյութը</button>
+    <button id="watchABtn"><span class="play">&#9654;</span>Պատասխանի տեսանյութը</button>
+  </div>
+</div>
+
+<div id="videoModal" class="modal-overlay">
+  <div class="modal-box">
+    <button id="closeModal" class="close-btn" aria-label="Փակել">&times;</button>
+    <video id="popupVideo" controls></video>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const colors = <%- JSON.stringify(colors) %>;
+  const QUESTIONS = <%- JSON.stringify(questions) %>;
+  let currentIndex = <%- currentIndex %>;
+  let answers = (QUESTIONS[currentIndex] && QUESTIONS[currentIndex].answers) || [];
+
+  const socket = io();
+  socket.emit('joinAdmin');
+
+  function renderBars(votes){
+    const total = votes.reduce((a,b)=>a+b,0) || 1;
+    document.getElementById('bars').innerHTML = answers.map((label,i) => {
+      const pct = Math.round(votes[i]/total*100);
+      const c = colors[i];
+      const boxStyle = 'background:color-mix(in srgb,'+c+' 80%, white);'+
+                        'border-color:color-mix(in srgb,'+c+' 85%, black)';
+      return '<div class="option" style="'+boxStyle+'">'+
+        '<div class="option-head">'+
+          '<span class="option-name">'+label+'</span>'+
+          '<span class="option-meta"><span class="option-votes">'+votes[i]+' ձայն</span><span class="option-pct">'+pct+'%</span></span>'+
+        '</div>'+
+        '<div class="track"><div class="fill" style="width:'+pct+'%"></div></div>'+
+        '</div>';
+    }).join('');
+  }
+
+  function renderQuestion(index, text, total){
+    currentIndex = index;
+    answers = (QUESTIONS[index] && QUESTIONS[index].answers) || [];
+    document.getElementById('q').textContent = text;
+    document.getElementById('pos').textContent = (index+1)+' / '+total;
+  }
+
+  socket.on('questionChanged', (qData) => {
+    renderQuestion(qData.index, qData.text, qData.total);
+    renderBars([0,0,0,0]);
+  });
+  socket.on('stats', (d) => renderBars(d.votes));
+
+  document.getElementById('prev').onclick = () => fetch('/admin/prev', {method:'POST'});
+  document.getElementById('next').onclick = () => fetch('/admin/next', {method:'POST'});
+
+  fetch('/admin/state').then(r=>r.json()).then(qData=>{
+    renderQuestion(qData.index, qData.text, qData.total);
+    renderBars(qData.votes);
+  });
+
+  // ---- video timestamp popup ----
+  const video = document.getElementById('popupVideo');
+  const modal = document.getElementById('videoModal');
+  let currentSrc = null;
+
+  // offsetSeconds lets the question video start a bit earlier than the timestamp
+  function openVideo(fileName, offsetSeconds){
+    offsetSeconds = offsetSeconds || 0;
+    const rawTs = (QUESTIONS[currentIndex] && QUESTIONS[currentIndex].timestamp) || 0;
+    const ts = Math.max(0, rawTs - offsetSeconds);
+
+    const seekTo = () => {
+      video.currentTime = ts;
+      video.pause();
+    };
+
+    if (currentSrc !== fileName) {
+      video.setAttribute('src', '/' + fileName);
+      currentSrc = fileName;
+      video.addEventListener('loadedmetadata', seekTo, { once: true });
+    } else if (video.readyState >= 1) {
+      seekTo();
+    } else {
+      video.addEventListener('loadedmetadata', seekTo, { once: true });
+    }
+
+    modal.style.display = 'flex';
+  }
+
+  function closeVideo(){
+    video.pause();
+    modal.style.display = 'none';
+  }
+
+  document.getElementById('watchQBtn').onclick = () => openVideo('question.webm', 3);
+  document.getElementById('watchABtn').onclick = () => openVideo('answer.webm', 0);
+  document.getElementById('closeModal').onclick = closeVideo;
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeVideo(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.style.display === 'flex') closeVideo();
+  });
+</script>
+</body>
+</html>
